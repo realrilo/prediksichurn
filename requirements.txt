@@ -124,4 +124,3 @@ tornado==6.3.3
 tqdm==4.63.0
 traitlets==5.14.1
 transformers==4.41.2
-w3lib==1.22.0
