@@ -50,8 +50,6 @@ def preprocess_input(data):
                 data[col] = 0  # Nilai default, bisa disesuaikan
         return data
 
-
-
 def main():
     st.set_page_config(page_title="Prediksi Customer Churn", layout="wide")
 
@@ -67,8 +65,8 @@ def main():
     st.sidebar.info('Aplikasi ini dibuat untuk memprediksi customer churn')
     st.sidebar.image(image2, use_column_width=True)
     st.info("Baca bagian tambahan untuk keterangan input dan penjelasan dataset", icon="ℹ️")
+    
     if pilihan == 'Prediksi':
-        
         st.title("Prediksi Customer Churn")
 
         if prediksi_selectbox == 'Online':
@@ -127,13 +125,16 @@ def main():
             }
 
             if st.button("Prediksi"):
-                input_df = preprocess_input(input_dict)
-                X = transformer.transform(input_df)
-                y_pred_prob = model.predict(X)[0, 0]
-                churn = y_pred_prob >= 0.5
-                output_prob = float(y_pred_prob)
-                output = bool(churn)
-                st.success(f'Churn: {output}, Skor Risiko: {output_prob}')
+                if tenure == 0 or monthlycharges == 0:
+                    st.warning("Pengguna ini tidak berlangganan.")
+                else:
+                    input_df = preprocess_input(input_dict)
+                    X = transformer.transform(input_df)
+                    y_pred_prob = model.predict(X)[0, 0]
+                    churn = y_pred_prob >= 0.5
+                    output_prob = float(y_pred_prob)
+                    output = bool(churn)
+                    st.success(f'Churn: {output}, Skor Risiko: {output_prob}')
 
         elif prediksi_selectbox == 'Per_Batch':
             st.write("### Unggah File CSV")
@@ -151,11 +152,14 @@ def main():
                 data = pd.read_csv(file_upload)
                 data = data.applymap(lambda s: s.lower() if type(s) == str else s)
                 data = preprocess_input(data)
-                X = transformer.transform(data)
-                y_pred_prob = model.predict(X)[:, 0]
-                churn = (y_pred_prob >= 0.5).astype(bool)
-                data['Churn'] = churn
-                st.write(data)
+                if (data['tenure'] == 0).all() and (data['MonthlyCharges'] == 0).all():
+                    st.warning("Beberapa pelanggan dalam file tidak berlangganan.")
+                else:
+                    X = transformer.transform(data)
+                    y_pred_prob = model.predict(X)[:, 0]
+                    churn = (y_pred_prob >= 0.5).astype(bool)
+                    data['Churn'] = churn
+                    st.write(data)
                 
             st.markdown("""
             Format CSV harus sesuai dengan kolom berikut:
@@ -180,9 +184,7 @@ def main():
             - **TotalCharges**
             """)
 
-
     elif pilihan == 'Tambahan':
-        
         if tambahan_selectbox == 'Keterangan Input':
             st.header("Keterangan Input")
             st.markdown("""
