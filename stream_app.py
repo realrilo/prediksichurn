@@ -55,7 +55,7 @@ def main():
 
     # Menyesuaikan gambar untuk ukuran yang lebih kecil
     image = Image.open('images/rilo_bg.jpg').resize((220, 110))
-    image2 = Image.open('images/gunadarma_logo.png')
+    image2 = Image.open('images/rilo_logo.png')
     st.sidebar.image(image, use_column_width=True)
     
     pilihan = st.sidebar.radio("Pilih Menu:", ("Prediksi", "Tambahan"))
